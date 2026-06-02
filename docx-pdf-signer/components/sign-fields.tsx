@@ -1,10 +1,16 @@
 "use client";
 import * as React from "react";
+import dynamic from "next/dynamic";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dropzone } from "@/components/dropzone";
-import { StampPositioner } from "@/components/stamp-positioner";
 import type { PdfRect } from "@/lib/coords";
+
+// pdf.js é client-only (usa DOMMatrix/Canvas); carregado sem SSR para não quebrar o prerender.
+const StampPositioner = dynamic(
+  () => import("@/components/stamp-positioner").then((m) => m.StampPositioner),
+  { ssr: false },
+);
 
 export interface SignConfig {
   pfx: File | null;
