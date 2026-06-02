@@ -1,0 +1,60 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - GOTENBERG_URL=http://gotenberg:3000
+      - SIGNER_URL=http://signer:8000
+      - GOTENBERG_TIMEOUT_MS=120000
+      - SIGNER_TIMEOUT_MS=60000
+      - MAX_UPLOAD_MB=25
+      - DEFAULT_TSA_URL=${DEFAULT_TSA_URL:-}
+    depends_on:
+      gotenberg:
+        condition: service_healthy
+      signer:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Conversão fiel DOCX->PDF via LibreOffice headless.
+  # Variante 8-libreoffice: ~38% menor, sem Chromium (não precisamos dele).
+  gotenberg:
+    image: gotenberg/gotenberg:8-libreoffice
+    # NÃO publicar porta em produção. Em dev, descomente para testar via curl:
+    # ports:
+    #   - "127.0.0.1:3000:3000"
+    command:
+      - "gotenberg"
+      - "--libreoffice-restart-after=10"   # recicla o LO a cada 10 conversões (estabilidade)
+      - "--api-timeout=120s"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # Assinatura PAdES (A1 ICP-Brasil) via pyHanko.
+  signer:
+    build:
+      context: ./signer
+      dockerfile: Dockerfile
+    # tmpfs para material de certificado: nunca toca disco persistente.
+    tmpfs:
+      - /tmp/signer:size=64m,mode=1700
+    environment:
+      - MAX_UPLOAD_MB=25
+      - SIGNER_TMPDIR=/tmp/signer
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0) if urllib.request.urlopen('http://localhost:8000/health').status==200 else sys.exit(1)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped

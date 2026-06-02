@@ -1,0 +1,5 @@
+# Assinatura PAdES (B-B/B-T/B-LT/B-LTA), carimbo de tempo RFC 3161, validação de chain.
+pyHanko[image-support,opentype]==0.35.1
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20

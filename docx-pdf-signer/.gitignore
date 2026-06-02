@@ -1,0 +1,11 @@
+node_modules
+.next
+.env
+*.pfx
+*.p12
+*.pem
+*.key
+out
+dist
+__pycache__
+*.pyc

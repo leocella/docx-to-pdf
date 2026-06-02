@@ -1,0 +1,19 @@
+# deps / build
+node_modules/
+.next/
+out/
+dist/
+
+# env e segredos — NUNCA versionar
+.env
+.env.local
+*.pfx
+*.p12
+test-cert.pfx
+
+# brainstorm visual companion (mockups/estado) — specs ficam versionados
+.superpowers/
+
+# OS
+.DS_Store
+Thumbs.db
