@@ -167,6 +167,30 @@ curl http://localhost:3001/api/health
 # esperado: {"status":"ok","services":{"gotenberg":true,"signer":true}}
 ```
 
+### Deixar subir sozinho quando ligar a máquina (recomendado)
+
+Para não precisar rodar nenhum comando toda vez, garanta que o **Docker inicia junto
+com o sistema**:
+
+```bash
+sudo systemctl enable docker
+```
+
+Os 3 serviços já têm `restart: unless-stopped` no `docker-compose.yml`, então, depois do
+primeiro `docker compose up -d`, eles **voltam automaticamente** sempre que a máquina
+reiniciar. Na prática: **liga o notebook → abre <http://localhost:3001> → usa.** Sem
+comandos.
+
+Para conferir que funcionou, reinicie a máquina e rode:
+
+```bash
+docker compose ps                        # os 3 serviços devem aparecer Up/healthy
+curl http://localhost:3001/api/health    # deve responder {"status":"ok",...}
+```
+
+> Só é preciso rodar `docker compose up -d` de novo se você tiver derrubado os serviços
+> de propósito com `docker compose down`.
+
 ---
 
 ## 7. Validar tudo com o smoke test
