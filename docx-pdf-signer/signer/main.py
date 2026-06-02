@@ -176,7 +176,9 @@ async def sign(
         )
 
         try:
-            pdf_signer.sign_pdf(writer, output=out)
+            # API async: o handler roda em event loop; sign_pdf() síncrono usa
+            # asyncio.run() internamente e quebraria dentro do loop do FastAPI.
+            await pdf_signer.async_sign_pdf(writer, output=out)
         except Exception as e:
             log.exception("erro durante assinatura")
             # erros comuns: cert sem non-repudiation, TSA inacessível, etc.
