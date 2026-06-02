@@ -22,5 +22,6 @@ export function download(blob: Blob, filename: string): void {
   a.href = URL.createObjectURL(blob);
   a.download = filename;
   a.click();
-  URL.revokeObjectURL(a.href);
+  // Revogar só depois que o navegador consumiu a URL (síncrono demais quebra Firefox/Safari).
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }

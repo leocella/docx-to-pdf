@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
 
     const pfxBytes = new Uint8Array(await pfxFile.arrayBuffer());
 
-    const rawLevel = String(form.get("level") ?? "B-T").toUpperCase() as Level;
+    const rawLevel = String(form.get("level") ?? "B-B").toUpperCase() as Level;
     if (!LEVELS.includes(rawLevel)) throw new AppError("INVALID_LEVEL", "Nível de assinatura inválido.", 400);
 
     const tsaUrl = (form.get("tsa_url") as string | null) || process.env.DEFAULT_TSA_URL || undefined;
@@ -62,6 +62,9 @@ export async function POST(req: NextRequest) {
         }
       }
       if ((page as number) < 1) throw new AppError("INVALID_STAMP", "A página do carimbo deve ser ≥ 1.", 400);
+      if ((width as number) <= 0 || (height as number) <= 0) {
+        throw new AppError("INVALID_STAMP", "O carimbo precisa de largura e altura maiores que zero.", 400);
+      }
       Object.assign(params, { page, x, y, width, height });
     }
 

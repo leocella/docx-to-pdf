@@ -43,6 +43,12 @@ export function SignFields({
   setCfg: React.Dispatch<React.SetStateAction<SignConfig>>;
   previewPdf: Blob | null;
 }) {
+  // Identidade estável: o StampPositioner chama onChange dentro de um useEffect que
+  // tem onChange nas deps; um arrow inline criaria novo identity a cada render → loop.
+  const onStampChange = React.useCallback(
+    (rect: PdfRect) => setCfg((c) => ({ ...c, rect })),
+    [setCfg],
+  );
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -90,7 +96,7 @@ export function SignFields({
         Carimbo visível no documento
       </label>
       {cfg.visible && previewPdf && (
-        <StampPositioner pdf={previewPdf} onChange={(rect) => setCfg((c) => ({ ...c, rect }))} />
+        <StampPositioner pdf={previewPdf} onChange={onStampChange} />
       )}
       {cfg.visible && !previewPdf && (
         <p className="text-sm text-muted-foreground">O preview aparece após selecionar/gerar o PDF.</p>
