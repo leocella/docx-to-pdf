@@ -15,6 +15,9 @@ docker compose up --build
 # app em http://localhost:3001
 ```
 
+> **Instalação do zero numa máquina Linux** (o que instalar, git clone, passo a passo):
+> veja [`INSTALACAO.md`](INSTALACAO.md).
+
 ## Testar assinatura sem certificado real
 ```bash
 ./scripts/gen-test-cert.sh minhasenha   # gera test-cert.pfx
