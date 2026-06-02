@@ -33,13 +33,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | `signer/main.py` | FastAPI + pyHanko. `POST /sign`, `GET /health`. Único arquivo Python. |
 | `scripts/gen-test-cert.sh` | Gera `.pfx` autoassinado de teste (bash/openssl — usar via WSL/Git Bash no Windows). |
 
-**Já implementado:** os 3 serviços, todas as rotas Next, o cliente/retry/validação, o signer (B-B → B-T → B-LT → B-LTA), docker-compose com healthchecks, shred do `.pfx` em tmpfs. As tarefas do §7 e os checkboxes do §5 estão, em sua maioria, **concluídos** — trate-os como referência de requisitos, não como TODO.
+**Já implementado:** os 3 serviços, todas as rotas Next, o cliente/retry/validação, o signer (B-B → B-T → B-LT → B-LTA), docker-compose com healthchecks, shred do `.pfx` em tmpfs. Após o **passe de production-ready** (Fases 1–4, ver `docx-pdf-signer/docs/superpowers/plans/2026-06-02-production-ready-pass.md`):
+- **Git** versionado (raiz), com `.gitignore` blindando `*.pfx`/`.env`/`.superpowers/`.
+- **Fila de concorrência** das conversões: `lib/semaphore.ts` + `lib/conversion-queue.ts` (`MAX_CONCURRENT_CONVERSIONS`, `QUEUE_TIMEOUT_MS`; erro `BUSY` 503 ao estourar).
+- **Opções de assinatura completas**: `/api/sign` encaminha/valida `contact`, `reason`, `location`, `level` (incl. `B-LTA`), regra nível×TSA, e coordenadas do carimbo visível.
+- **UI em shadcn/ui**: abas (Converter/Assinar/Combinado), `Dropzone` drag-and-drop, `StampPositioner` (preview pdf.js + arrastar/redimensionar, fallback de presets), toasts PT-BR. pdf.js é carregado client-only (`next/dynamic` `ssr:false`).
+
+As tarefas do §7 e os checkboxes do §5 estão **concluídos** — trate-os como referência de requisitos.
 
 **Lacunas conhecidas (spec × realidade) — confira antes de assumir que existe:**
-- **UI é um MVP mínimo** em Tailwind puro: sem shadcn/ui, sem drag-and-drop, sem posicionamento de carimbo visível. O §2/§7 menciona shadcn e `frontend-design`, mas nada disso foi instalado/aplicado ainda.
-- **Sem testes automatizados.** `package.json` tem só `dev`/`build`/`start`/`lint`; não há jest/vitest/playwright nem `pytest`. O §9 descreve testes **manuais**.
-- **Sem fila/limite de concorrência** (§5 e §7.6) — ainda não existe.
-- `app/api/sign/route.ts` não encaminha `contact` nem opções de carimbo visível; a UI não expõe `reason`/`location`/`visible`. O tipo TS em `signer-client.ts` aceita só `B-B|B-T|B-LT`, mas o signer Python também trata `B-LTA`.
+- **Sem testes automatizados.** `package.json` tem só `dev`/`build`/`start`/`lint`; não há jest/vitest/playwright nem `pytest`. O §9 descreve testes **manuais**. Validação de runtime (Docker + navegador + cert) é manual.
+- **Fila é por processo**, não global: em multi-réplica (Swarm) o limite é por réplica, não no Gotenberg compartilhado. Trade-off aceito no MVP.
+- `pdfjs-dist` instalado é **v6** (API de render usa `canvas`, não o legado `canvasContext`).
 - `next lint` está no `package.json`, mas não há config ESLint commitada — confirme antes de confiar nele.
 
 ---

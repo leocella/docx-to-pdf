@@ -13,6 +13,8 @@ services:
       - GOTENBERG_TIMEOUT_MS=120000
       - SIGNER_TIMEOUT_MS=60000
       - MAX_UPLOAD_MB=25
+      - MAX_CONCURRENT_CONVERSIONS=2
+      - QUEUE_TIMEOUT_MS=30000
       - DEFAULT_TSA_URL=${DEFAULT_TSA_URL:-}
     depends_on:
       gotenberg:

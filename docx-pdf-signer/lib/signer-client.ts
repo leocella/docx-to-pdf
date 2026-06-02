@@ -9,7 +9,7 @@ export interface SignParams {
   pfx: Uint8Array;
   password: string;
   tsaUrl?: string;
-  level?: "B-B" | "B-T" | "B-LT";
+  level?: "B-B" | "B-T" | "B-LT" | "B-LTA";
   reason?: string;
   location?: string;
   contact?: string;
