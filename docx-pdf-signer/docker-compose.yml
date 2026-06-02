@@ -48,8 +48,10 @@ services:
       context: ./signer
       dockerfile: Dockerfile
     # tmpfs para material de certificado: nunca toca disco persistente.
+    # mode=1777 (como /tmp): o tmpfs monta como root e o processo roda como uid 1001.
+    # O .pfx é gravado com 0600 pelo main.py, então fica restrito ao dono mesmo aqui.
     tmpfs:
-      - /tmp/signer:size=64m,mode=1700
+      - /tmp/signer:size=64m,mode=1777
     environment:
       - MAX_UPLOAD_MB=25
       - SIGNER_TMPDIR=/tmp/signer

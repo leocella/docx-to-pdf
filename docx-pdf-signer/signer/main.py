@@ -102,8 +102,9 @@ async def sign(
         pfx_bytes = await _read_limited(pfx, "certificado")
         _validate_magic(pdf_bytes, b"%PDF", "PDF")
 
-        # grava o PFX em tmpfs apenas para o load (pyHanko lê de caminho)
-        with open(pfx_path, "wb") as f:
+        # grava o PFX em tmpfs apenas para o load (pyHanko lê de caminho), com 0600
+        fd = os.open(pfx_path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(fd, "wb") as f:
             f.write(pfx_bytes)
 
         try:
