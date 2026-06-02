@@ -4,6 +4,10 @@ node_modules/
 out/
 dist/
 
+# artefatos gerados pelo Next/TS (não versionar)
+next-env.d.ts
+*.tsbuildinfo
+
 # env e segredos — NUNCA versionar
 .env
 .env.local
