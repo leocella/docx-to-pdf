@@ -18,6 +18,9 @@ test-cert.pfx
 # brainstorm visual companion (mockups/estado) — specs ficam versionados
 .superpowers/
 
+# saída do smoke-test
+smoke-out/
+
 # OS
 .DS_Store
 Thumbs.db
